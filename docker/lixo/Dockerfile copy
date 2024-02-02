@@ -1,0 +1,31 @@
+# Use a imagem base do Ubuntu
+FROM ubuntu:20.04
+
+# Atualize as dependências e instale o tzdata para evitar problemas com interação durante a instalação
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
+
+# Instale o Samba (implementação de AD para Linux)
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y samba krb5-user winbind libpam-winbind libnss-winbind
+
+# Copie os arquivos de configuração
+COPY smb.conf /etc/samba/smb.conf
+COPY krb5.conf /etc/krb5.conf
+
+# Adicione as configurações de ambiente para o Samba
+ENV SAMBA_REALM=NTEDU.LOCAL \
+    SAMBA_DOMAIN=NTEDU \
+    SAMBA_PASSWORD=Passw0rd \
+    SAMBA_ADMIN_PASSWORD=AdminPassw0rd
+
+# Expor portas necessárias
+EXPOSE 53 88 135 139 389 445 464 636 3268 3269
+
+# Copie o script de configuração
+COPY setup.sh /usr/local/bin/setup.sh
+
+# Defina as permissões e execute o script durante a inicialização
+RUN chmod +x /usr/local/bin/setup.sh
+
+# Comando padrão do contêiner
+CMD ["sh", "-c", "/usr/local/bin/setup.sh && samba --interactive -d3 -i"]

@@ -1,0 +1,14 @@
+# Use uma imagem base do Ubuntu
+FROM ubuntu:20.04
+
+# Atualize as dependências
+RUN apt-get update && apt-get upgrade -y
+
+# Instale algumas ferramentas básicas
+RUN apt-get install -y iputils-ping net-tools
+
+# Adicione um usuário chamado 'administrator' com a senha 'Angola2023!'
+RUN useradd -m -s /bin/bash administrator && echo "administrator:Angola2023!" | chpasswd
+
+# Comando padrão do contêiner
+CMD ["bash"]
