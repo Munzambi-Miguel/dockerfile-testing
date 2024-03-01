@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  samba:
+    build: .
+    ports:
+      - "5445:445"
+    volumes:
+      - /working-dir
+    stdin_open: true
+    tty: true
+    restart: always
